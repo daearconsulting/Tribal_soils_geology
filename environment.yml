@@ -1,0 +1,37 @@
+name: tribal-soils-geology
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - geopandas
+  - shapely>=2.0
+  - fiona
+  - pyproj
+  - rasterio
+  - xarray
+  - scipy
+  - matplotlib
+  - matplotlib-scalebar
+  - contextily
+  - folium
+  - plotly           # 3D visualization (notebook 04)
+  - pyvista          # 3D subsurface rendering (notebook 04)
+  - pyvistaqt        # pyvista Qt backend
+  - vtk              # pyvista dependency
+  - ipywidgets       # interactive controls in notebooks
+  - ipykernel
+  - jupyter
+  - jupyterlab
+  - notebook
+  - pyyaml
+  - requests
+  - tenacity
+  - tqdm
+  - seaborn
+  - pyogrio          # fast GeoDataFrame I/O (needed for large GDB files)
+  - pip
+  - pip:
+    - sciencebasepy  # USGS ScienceBase Python client
