@@ -115,18 +115,24 @@ def load_all_oceti_sakowin(force_refresh: bool = False) -> gpd.GeoDataFrame:
 
 # NHD stream network
 @_retry
-def load_nhd_flowlines(bbox, min_stream_order=2):
+def load_nhd_flowlines(bbox, min_stream_order=2, named_only=False):
     NHD_URL = (
         "https://hydro.nationalmap.gov/arcgis/rest/services/"
         "NHDPlus_HR/MapServer/3/query"
     )
+
+    where_parts = [f"streamorde >= {min_stream_order}"]
+    if named_only:
+        where_parts.append("gnis_name IS NOT NULL AND gnis_name <> ''")
+    where = " AND ".join(where_parts)
+
     all_features = []
     offset = 0
     batch_size = 2000
 
     while True:
         r = requests.get(NHD_URL, params={
-            "where":             f"streamorde >= {min_stream_order}",
+            "where":             where,
             "outFields":         "reachcode,gnis_name,streamorde,lengthkm",
             "f":                 "geojson",
             "returnGeometry":    "true",
@@ -149,7 +155,7 @@ def load_nhd_flowlines(bbox, min_stream_order=2):
         print(f"  Fetched {len(batch)} features (offset {offset})")
 
         if len(batch) < batch_size:
-            break   # last page
+            break
         offset += batch_size
 
     if not all_features:
