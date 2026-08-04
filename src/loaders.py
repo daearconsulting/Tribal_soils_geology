@@ -115,62 +115,50 @@ def load_all_oceti_sakowin(force_refresh: bool = False) -> gpd.GeoDataFrame:
 
 # NHD stream network
 @_retry
-def load_nhd_flowlines(
-    bbox: tuple[float, float, float, float],
-    min_stream_order: int = 1,
-    force_refresh: bool = False,
-) -> gpd.GeoDataFrame:
-    cache_key  = (f"nhd_{bbox[0]:.2f}_{bbox[1]:.2f}_{bbox[2]:.2f}"
-                  f"_{bbox[3]:.2f}_o{min_stream_order}.geojson")
-    cache_file = CACHE_DIR / cache_key
-
-    if cache_file.exists() and not force_refresh:
-        return gpd.read_file(cache_file)
-
-    where = f"streamorde >= {min_stream_order}" if min_stream_order > 0 else "1=1"
-
+def load_nhd_flowlines(bbox, min_stream_order=2):
+    NHD_URL = (
+        "https://hydro.nationalmap.gov/arcgis/rest/services/"
+        "NHDPlus_HR/MapServer/3/query"
+    )
     all_features = []
     offset = 0
-    page_size = 2000
+    batch_size = 2000
 
     while True:
-        r = requests.get(
-            NHD_FLOWLINE_URL,
-            params={
-                "where":            where,
-                "outFields":        "reachcode,gnis_name,streamorde,lengthkm",
-                "f":                "geojson",
-                "returnGeometry":   "true",
-                "outSR":            "4326",
-                "geometry":         f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}",
-                "geometryType":     "esriGeometryEnvelope",
-                "spatialRel":       "esriSpatialRelIntersects",
-                "inSR":             "4326",
-                "resultOffset":     offset,
-                "resultRecordCount": page_size,
-            },
-            timeout=120,
-        )
-        if r.status_code == 500:
-            break
-        r.raise_for_status()
-        payload = r.json()
+        r = requests.get(NHD_URL, params={
+            "where":             f"streamorde >= {min_stream_order}",
+            "outFields":         "reachcode,gnis_name,streamorde,lengthkm",
+            "f":                 "geojson",
+            "returnGeometry":    "true",
+            "outSR":             "4326",
+            "geometry":          f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}",
+            "geometryType":      "esriGeometryEnvelope",
+            "inSR":              "4326",
+            "resultOffset":      offset,
+            "resultRecordCount": batch_size,
+        }, timeout=120)
 
-        features = payload.get("features", [])
-        all_features.extend(features)
+        if r.status_code != 200 or len(r.content) < 100:
+            break
 
-        if not payload.get("exceededTransferLimit") and len(features) < page_size:
+        batch = gpd.read_file(BytesIO(r.content))
+        if batch.empty:
             break
-        if not features:
-            break
-        offset += page_size
+
+        all_features.append(batch)
+        print(f"  Fetched {len(batch)} features (offset {offset})")
+
+        if len(batch) < batch_size:
+            break   # last page
+        offset += batch_size
 
     if not all_features:
         return gpd.GeoDataFrame()
 
-    gdf = gpd.GeoDataFrame.from_features(all_features, crs=CRS_GEOGRAPHIC)
-    gdf.to_file(cache_file, driver="GeoJSON")
-    return gdf
+    streams = pd.concat(all_features, ignore_index=True)
+    streams = streams.set_crs("EPSG:4326", allow_override=True)
+    print(f"Total stream segments: {len(streams):,}")
+    return streams
 
 
 # HUC watershed boundaries
