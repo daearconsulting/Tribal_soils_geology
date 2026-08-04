@@ -1,19 +1,16 @@
 """
-sovereignty.py — Data governance acknowledgment for tribal_soils_geology.
+sovereignty.py Data governance acknowledgment for tribal_soils_geology.
 
 Implements OCAP®, CARE, FAIR, and IEEE 2890-2025 frameworks for all
 geological and soils data describing Pine Ridge and Rosebud Reservation lands.
 
 Subsurface governance note
---------------------------
-The geology and soils of Pine Ridge and Rosebud are not merely physical
-resources — they are the material foundation of Lakota sovereignty. The
-Arikaree aquifer, the Pierre Shale, the Badlands formations are not
-abstractions. They are the land itself. Federal geological surveys conducted
-on these territories produce data that describes Tribal resources. That data
-is subject to OCAP® principles: Tribal Nations retain the right to Ownership,
-Control, Access, and Possession of data about their lands, regardless of which
-agency collected it.
+The geology and soils of Pine Ridge and Rosebud are the material foundation of 
+Lakota sovereignty. The Arikaree aquifer, the Pierre Shale, the Badlands formations 
+are the land itself. Federal geological surveys conducted on these territories produce 
+data that describes Tribal resources. That data is subject to OCAP® principles: Tribal 
+Nations retain the right to Ownership, Control, Access, and Possession of data about their 
+lands, regardless of which agency collected it.
 
 This module ensures every notebook in the series opens with this framing
 and every data export includes provenance sufficient to trace the data back
@@ -24,7 +21,7 @@ from __future__ import annotations
 
 from src.constants import TREATY_PROVENANCE, GOVERNANCE_REFS, WSD_3D_MODEL
 
-# ── Data source registry ───────────────────────────────────────────────────
+# Data source registry
 _DATA_SOURCES: dict[str, dict] = {
 
     "usgs_3d_model": {
@@ -41,7 +38,7 @@ _DATA_SOURCES: dict[str, dict] = {
     },
 
     "usda_ssurgo": {
-        "name":     "USDA NRCS SSURGO — Soil Survey Geographic Database",
+        "name":     "USDA NRCS SSURGO Soil Survey Geographic Database",
         "citation": (
             "Soil Survey Staff, Natural Resources Conservation Service, "
             "United States Department of Agriculture. Web Soil Survey. "
@@ -59,7 +56,7 @@ _DATA_SOURCES: dict[str, dict] = {
     },
 
     "usgs_state_geology": {
-        "name":     "USGS Mineral Resources — South Dakota State Geologic Map",
+        "name":     "USGS Mineral Resources South Dakota State Geologic Map",
         "citation": (
             "US Geological Survey, Mineral Resources Online Spatial Data. "
             "State Geologic Map Compilation. "
@@ -72,7 +69,7 @@ _DATA_SOURCES: dict[str, dict] = {
     },
 
     "census_aiannh": {
-        "name":     "US Census Bureau — TIGER/Line AIANNH Boundaries",
+        "name":     "US Census Bureau TIGER/Line AIANNH Boundaries",
         "citation": (
             "US Census Bureau. TIGER/Line Shapefiles: American Indian / "
             "Alaska Native / Native Hawaiian Areas (AIANNH). "
@@ -89,7 +86,7 @@ _DATA_SOURCES: dict[str, dict] = {
     },
 
     "usgs_nwis_wells": {
-        "name":     "USGS NWIS — Well Logs and Groundwater Data",
+        "name":     "USGS NWIS Well Logs and Groundwater Data",
         "citation": (
             "U.S. Geological Survey, 2024, National Water Information System "
             "data available on the World Wide Web (USGS Water Data for the Nation). "
@@ -122,11 +119,11 @@ _DATA_SOURCES: dict[str, dict] = {
         "citation": (
             "Data collected by or in partnership with the Oglala Lakota "
             "and/or Sicangu Lakota natural resource departments. "
-            "Governed by OCAP® — Tribal Nations retain ownership and control."
+            "Governed by OCAP®: Tribal Nations retain ownership and control."
         ),
-        "url":      "data/raw/ (local only — never committed to version control)",
+        "url":      "data/raw/ (local only, never committed to version control)",
         "steward":  "Tribal Nation natural resource department",
-        "license":  "Tribal — governed by OCAP®",
+        "license":  "Tribal: governed by OCAP®",
         "note":     (
             "This data is GITIGNORED and stays under Tribal control. "
             "It is never uploaded to GitHub or shared without explicit "
@@ -139,11 +136,11 @@ _DATA_SOURCES: dict[str, dict] = {
         "citation": (
             "Data collected by or in partnership with the Oglala Lakota "
             "and/or Sicangu Lakota natural resource departments. "
-            "Governed by OCAP® — Tribal Nations retain ownership and control."
+            "Governed by OCAP®: Tribal Nations retain ownership and control."
         ),
-        "url":      "data/raw/ (local only — never committed to version control)",
+        "url":      "data/raw/ (local only: never committed to version control)",
         "steward":  "Tribal Nation natural resource department",
-        "license":  "Tribal — governed by OCAP®",
+        "license":  "Tribal: governed by OCAP®",
         "note":     (
             "Tribal-collected well logs fill the USGS monitoring gap on "
             "reservation lands. This data is GITIGNORED."
@@ -157,12 +154,12 @@ def print_data_acknowledgment(source_keys: list[str] | None = None) -> None:
     Print the full data governance acknowledgment for a notebook.
     Call at the top of every notebook after imports.
     """
-    print("TRIBAL SOILS AND GEOLOGY — DATA GOVERNANCE ACKNOWLEDGMENT")
+    print("TRIBAL SOILS AND GEOLOGY DATA GOVERNANCE ACKNOWLEDGMENT")
     print("=" * 65)
     print()
     print(
         "This analysis uses data that describes the lands and subsurface\n"
-        "resources of the Oceti Sakowin — the Lakota, Dakota, and Nakota\n"
+        "resources of the Oceti Sakowin, the Lakota, Dakota, and Nakota\n"
         "peoples. This data is governed by the following frameworks:"
     )
     print()
@@ -194,7 +191,6 @@ def print_data_acknowledgment(source_keys: list[str] | None = None) -> None:
 
     if source_keys:
         print("DATA SOURCES USED IN THIS NOTEBOOK")
-        print("-" * 40)
         for key in source_keys:
             src = _DATA_SOURCES.get(key)
             if not src:
@@ -211,8 +207,7 @@ def generate_citations(source_keys: list[str]) -> str:
     """Return a plain-text citation block for notebook outputs."""
     lines = []
     lines.append("DATA CITATIONS")
-    lines.append("=" * 50)
-
+    
     for key in source_keys:
         src = _DATA_SOURCES.get(key)
         if not src:

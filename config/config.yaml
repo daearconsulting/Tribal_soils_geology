@@ -65,7 +65,7 @@ wsd_3d_model:
 # These drive the depth-to-formation maps in notebook 04
 key_horizons:
   - "Ogallala Group"          # Arikaree aquifer top
-  - "Pierre Shale"            # expansive clay — slope hazard
+  - "Pierre Shale"            # expansive clay slope hazard
   - "Hell Creek Formation"    # near-surface eastern reservation
   - "Niobrara Formation"      # secondary aquifer
   - "Madison Group"           # deep confined aquifer

@@ -1,5 +1,5 @@
 """
-constants.py — Project-wide constants for tribal_soils_geology.
+constants.py Project-wide constants for tribal_soils_geology.
 
 All values that change when adapting for a different Nation live in
 config/config.yaml. Constants here are technically stable values:
@@ -7,7 +7,6 @@ CRS definitions, URL bases, field name standards, data source references,
 and the 3D model metadata.
 
 Data sovereignty note
----------------------
 This repository describes the subsurface geology and soils of lands
 belonging to the Oglala Lakota and Sicangu Lakota peoples. Public federal
 datasets (USGS, USDA) covering these territories do not transfer authority
@@ -18,30 +17,30 @@ All data use is governed by OCAP®, CARE, FAIR, and IEEE 2890-2025.
 from __future__ import annotations
 from pathlib import Path
 
-# ── Repository root ────────────────────────────────────────────────────────
+# Repository root
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# ── Coordinate reference systems ───────────────────────────────────────────
-CRS_GEOGRAPHIC = "EPSG:4326"    # WGS84 lat/lon — all spatial data
-CRS_PROJECTED  = "EPSG:5070"    # Albers Equal Area CONUS — area calculations
-CRS_UTM14      = "EPSG:32614"   # UTM Zone 14N — local precision (SD)
-CRS_WEB        = "EPSG:3857"    # Web Mercator — basemap tiles
+# Coordinate reference systems
+CRS_GEOGRAPHIC = "EPSG:4326"    # WGS84 lat/lon all spatial data
+CRS_PROJECTED  = "EPSG:5070"    # Albers Equal Area CONUS area calculations
+CRS_UTM14      = "EPSG:32614"   # UTM Zone 14N local precision (SD)
+CRS_WEB        = "EPSG:3857"    # Web Mercator basemap tiles
 
-# ── Data directories ───────────────────────────────────────────────────────
-CACHE_DIR     = REPO_ROOT / "data" / "cache"
-RAW_DIR       = REPO_ROOT / "data" / "raw"
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
-GEOLOGY_DIR   = RAW_DIR / "geology"
-SSURGO_DIR    = RAW_DIR / "ssurgo"
-TEMPLATE_DIR  = RAW_DIR / "templates"
-OUTPUTS_DIR   = REPO_ROOT / "outputs"
-FIGURES_DIR   = OUTPUTS_DIR / "figures"
+# Data directories
+CACHE_DIR     = REPO_ROOT/"data" /"cache"
+RAW_DIR       = REPO_ROOT/"data" /"raw"
+PROCESSED_DIR = REPO_ROOT/"data" /"processed"
+GEOLOGY_DIR   = RAW_DIR/"geology"
+SSURGO_DIR    = RAW_DIR/"ssurgo"
+TEMPLATE_DIR  = RAW_DIR/"templates"
+OUTPUTS_DIR   = REPO_ROOT/"outputs"
+FIGURES_DIR   = OUTPUTS_DIR/"figures"
 
 for _d in [CACHE_DIR, PROCESSED_DIR, GEOLOGY_DIR, SSURGO_DIR,
            TEMPLATE_DIR, OUTPUTS_DIR, FIGURES_DIR]:
     _d.mkdir(parents=True, exist_ok=True)
 
-# ── Study area: Pine Ridge and Rosebud Reservations ───────────────────────
+# Study area: Pine Ridge and Rosebud Reservations
 # Bounding boxes (WGS84: min_lon, min_lat, max_lon, max_lat)
 PINE_RIDGE_BBOX    = (-103.5, 42.5, -101.5, 43.8)
 ROSEBUD_BBOX       = (-101.5, 42.8,  -99.8, 43.6)
@@ -52,7 +51,7 @@ STUDY_BBOX         = (-104.5, 42.3, -103.3, 44.6)  # extended for regional conte
 PINE_RIDGE_CENTROID = (-102.5, 43.1)
 ROSEBUD_CENTROID    = (-100.7, 43.2)
 
-# ── Census TIGER — Nation names ────────────────────────────────────────────
+# Census TIGER Nation names
 # Exact strings from the AIANNH shapefile NAME field
 PRIMARY_NATIONS_CENSUS = ["Pine Ridge", "Rosebud"]
 PRIMARY_NATIONS_COMMON = {
@@ -76,7 +75,7 @@ CENSUS_TO_COMMON = {
     "Flandreau":      "Flandreau Santee Sioux",
 }
 
-# ── API base URLs ──────────────────────────────────────────────────────────
+# API base URLs
 CENSUS_TIGER_BASE  = "https://www2.census.gov/geo/tiger"
 NHD_FLOWLINE_URL   = "https://hydro.nationalmap.gov/arcgis/rest/services/NHDPlus_HR/MapServer/3/query"
 WBD_HUC8_URL       = "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4/query"
@@ -90,10 +89,10 @@ USGS_LANDSLIDE_URL = (
     "web_mercator/hazards/MapServer/0/query"
 )
 
-# ── USGS 3D Geological Model of western South Dakota ─────────────────────
-# Spangler 2024 — ScienceBase doi:10.5066/P9LK4QHJ
-# CC0 — no restrictions on use
-# Study area: west of Missouri River to Wyoming border (covers Pine Ridge + Rosebud)
+# USGS 3D Geological Model of western South Dakota
+# Spangler 2024 ScienceBase doi:10.5066/P9LK4QHJ
+# CC0 no restrictions on use
+# Study area: west of Missouri River to Wyoming border (covers Pine Ridge and Rosebud)
 WSD_3D_MODEL = {
     "sciencebase_id": "642c5a73d34ee8d4add22046",
     "doi":            "10.5066/P9LK4QHJ",
@@ -108,24 +107,24 @@ WSD_3D_MODEL = {
         "642c5a73d34ee8d4add22046"
         "?service=wms&request=getcapabilities&version=1.3.0"
     ),
-    # Local paths — files placed in data/raw/geology/ after manual download
-    "gdb_path":        GEOLOGY_DIR / "WSouthDakota3D.gdb",
-    "shapefiles_path": GEOLOGY_DIR / "WSD_Shapefiles",
-    "tables_path":     GEOLOGY_DIR / "WSD_NonspatialTables",
+    # Local paths: files placed in data/raw/geology/ after manual download
+    "gdb_path":        GEOLOGY_DIR/"WSouthDakota3D.gdb",
+    "shapefiles_path": GEOLOGY_DIR/"WSD_Shapefiles",
+    "tables_path":     GEOLOGY_DIR/"WSD_NonspatialTables",
     "n_horizons":      25,
     "n_faults":        35,
-    "crs":             "EPSG:4269",   # NAD83 geographic — used in the GDB
+    "crs":             "EPSG:4269",   # NAD83 geographic is used in the GDB
 }
 
 # Stratigraphic units modeled in the 3D model (top to bottom, approximate)
 # Sources: WSD_NonspatialTables/DescriptionOfModelUnits
 WSD_STRATIGRAPHY = [
     "Glacial sediments",
-    "Ogallala Group",          # Arikaree aquifer — critical for groundwater
+    "Ogallala Group",          # Arikaree aquifer 
     "Hell Creek Formation",
     "Lance Formation",
     "Fox Hills Formation",
-    "Pierre Shale",            # thick, expansive — controls slope stability
+    "Pierre Shale",            # thick, expansive controls slope stability
     "Niobrara Formation",
     "Carlile Shale",
     "Greenhorn Formation",
@@ -145,14 +144,14 @@ WSD_STRATIGRAPHY = [
 
 # Units of particular significance for land and water management
 WSD_KEY_UNITS = {
-    "Ogallala Group":    "Primary aquifer for Pine Ridge and Rosebud — Arikaree formation",
-    "Pierre Shale":      "Expansive clay — controls slope instability, swelling soils",
-    "Hell Creek Formation": "Near-surface on eastern portion — paleontological resources",
-    "Madison Group":     "Deep confined aquifer — artesian potential in parts of study area",
-    "Niobrara Formation": "Fractured chalk — secondary aquifer in some areas",
+    "Ogallala Group":    "Primary aquifer for Pine Ridge and Rosebud Arikaree formation",
+    "Pierre Shale":      "Expansive clay controls slope instability, swelling soils",
+    "Hell Creek Formation": "Near-surface on eastern portion paleontological resources",
+    "Madison Group":     "Deep confined aquifer artesian potential in parts of study area",
+    "Niobrara Formation": "Fractured chalk secondary aquifer in some areas",
 }
 
-# ── SSURGO field name standards ────────────────────────────────────────────
+# SSURGO field name standards
 # Must match the ESRI Soil Data Downloader output schema
 SSURGO_MAP_UNIT_FIELDS = [
     "mukey", "musym", "muname", "mukind", "mustatus",
@@ -171,7 +170,7 @@ SSURGO_HORIZON_FIELDS = [
     "texture", "texdesc",
 ]
 
-# ── Intake template field standards ────────────────────────────────────────
+# Intake template field standards
 SOIL_PROFILE_FIELDS = [
     "profile_id", "date", "observer", "lat", "lon",
     "horizon", "depth_top_cm", "depth_bottom_cm",
@@ -193,10 +192,10 @@ FIELD_OBSERVATION_FIELDS = [
     "strike", "dip", "notes", "photo_ids",
 ]
 
-# ── Data sovereignty ────────────────────────────────────────────────────────
+# Data sovereignty
 TREATY_PROVENANCE = {
     "treaty_territory": (
-        "1868 Fort Laramie Treaty — Oceti Sakowin territory, "
+        "1868 Fort Laramie Treaty Oceti Sakowin territory, "
         "including the Great Sioux Reservation"
     ),
     "treaty_status": (

@@ -1,8 +1,8 @@
 # Tribal Soils and Geology
 
-**Author:** Lilly Jones, PhD, Daear Consulting, LLC/CIRES Earth Lab
-**Primary Focus:** Pine Ridge (Oglala Lakota) and Rosebud (Sicangu Lakota), Oceti Sakowin
-**License:** Apache 2.0
+**Author:** Lilly Jones, PhD, Daear Consulting, LLC/CIRES Earth Lab                          
+**Primary Focus:** Pine Ridge (Oglala Lakota) and Rosebud (Sicangu Lakota), Oceti Sakowin                    
+**License:** Apache 2.0                        
 
 ## Overview
 
@@ -44,8 +44,6 @@ This dataset has never been visualized in a Tribal land sovereignty context.
 Notebook 04 provides cross-sections, depth-to-formation maps, fault
 visualization, and isopach maps over Tribal boundaries.
 
----
-
 ## Data Sources
 
 ### Public data (downloaded manually: see below)
@@ -82,7 +80,7 @@ departments. Lives in `data/raw/` and is never committed to version control.
 
 **SSURGO soil data** (required for notebooks 05–06):
 1. Go to https://websoilsurvey.nrcs.usda.gov/
-2. Use the ESRI Soil Data Downloader
+2. Use the ESRI Soil Data Downloader https://esri.maps.arcgis.com/apps/instant/basic/index.html?appid=806c857d504c476ba6477ac475c45bf5
 3. Download by AREASYMBOL: SD113, SD007, SD063 (Pine Ridge) and SD121, SD095, SD123, SD055 (Rosebud)
 4. Extract to `data/raw/ssurgo/`
 

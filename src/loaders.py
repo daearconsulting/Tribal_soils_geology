@@ -1,5 +1,5 @@
 """
-loaders.py — Public data loaders for tribal_soils_geology.
+loaders.py Public data loaders for tribal_soils_geology.
 
 All functions follow the same pattern:
   - Check cache first, download only if needed
@@ -58,7 +58,7 @@ _retry = retry(
 )
 
 
-# ── Tribal boundaries ──────────────────────────────────────────────────────
+# Tribal boundaries
 
 def load_tribal_boundaries(
     nation_names: list[str] | None = None,
@@ -68,13 +68,11 @@ def load_tribal_boundaries(
     Load AIANNH Tribal boundaries from Census TIGER.
 
     Parameters
-    ----------
     nation_names  : Census NAME field values to filter.
                     Defaults to Pine Ridge and Rosebud only.
     force_refresh : Re-download even if cached.
 
     Returns
-    -------
     GeoDataFrame with columns: NAME, common_name, area_km2, geometry
     """
     if nation_names is None:
@@ -114,7 +112,7 @@ def load_all_oceti_sakowin(force_refresh: bool = False) -> gpd.GeoDataFrame:
     )
 
 
-# ── NHD stream network ─────────────────────────────────────────────────────
+# NHD stream network
 
 @_retry
 def load_nhd_flowlines(
@@ -126,7 +124,6 @@ def load_nhd_flowlines(
     Load NHDPlus HR stream network flowlines within a bounding box.
 
     Parameters
-    ----------
     bbox             : (min_lon, min_lat, max_lon, max_lat)
     min_stream_order : Minimum Strahler stream order (1 = all streams)
     """
@@ -163,7 +160,7 @@ def load_nhd_flowlines(
     return gdf
 
 
-# ── HUC watershed boundaries ───────────────────────────────────────────────
+# HUC watershed boundaries
 
 @_retry
 def load_huc_boundary(
@@ -215,7 +212,7 @@ def load_huc_boundary(
     return gdf
 
 
-# ── USGS NWIS well sites ───────────────────────────────────────────────────
+# USGS NWIS well sites
 
 def load_usgs_well_sites(
     bbox: tuple[float, float, float, float],
@@ -225,7 +222,7 @@ def load_usgs_well_sites(
     Fetch USGS groundwater monitoring well sites within a bounding box.
 
     Note: Coverage is systematically sparse on Tribal lands. Document gaps
-    as a policy finding — absence of data is a monitoring equity issue.
+    as a policy finding, absence of data is a monitoring equity issue.
     """
     bbox_str   = f"{bbox[0]:.2f}_{bbox[1]:.2f}_{bbox[2]:.2f}_{bbox[3]:.2f}"
     cache_file = CACHE_DIR / f"usgs_gw_sites_{bbox_str}.csv"
@@ -259,7 +256,7 @@ def load_usgs_well_sites(
         warnings.warn(
             "No USGS groundwater monitoring sites found. "
             "Monitoring gaps on Tribal lands are a federal infrastructure equity gap. "
-            "Tribal-collected well logs fill this gap — see data/templates/.",
+            "Tribal-collected well logs fill this gap, see data/templates/.",
             UserWarning, stacklevel=2,
         )
         return gpd.GeoDataFrame()
@@ -282,7 +279,7 @@ def load_usgs_well_sites(
     )
 
 
-# ── USGS 3D Geological Model (local file) ─────────────────────────────────
+# USGS 3D Geological Model (local file)
 
 def load_wsd_3d_model_boundary() -> gpd.GeoDataFrame:
     """
@@ -372,9 +369,8 @@ def load_wsd_horizon_raster(unit_name: str) -> object | None:
     Returns a rasterio DatasetReader or None if not available.
 
     Parameters
-    ----------
     unit_name : Formation name matching DescriptionOfModelUnits
-                e.g. "Ogallala Group", "Pierre Shale"
+                ex. "Ogallala Group", "Pierre Shale"
 
     Requires: data/raw/geology/WSouthDakota3D.gdb/
     """
@@ -401,7 +397,7 @@ def load_wsd_horizon_raster(unit_name: str) -> object | None:
         return None
 
 
-# ── SSURGO (local file) ────────────────────────────────────────────────────
+# SSURGO (local file)
 
 def load_ssurgo_mapunits(
     state_code: str | None = None,
@@ -413,8 +409,7 @@ def load_ssurgo_mapunits(
     Download by AREASYMBOL from: https://websoilsurvey.nrcs.usda.gov/
 
     Parameters
-    ----------
-    state_code : Optional filter (e.g. 'SD') — applied if a merged GDB is present.
+    state_code : Optional filter (ex. 'SD') applied if a merged GDB is present.
     """
     # Look for any GDB in the ssurgo directory
     gdbs = list(SSURGO_DIR.glob("*.gdb"))
@@ -535,72 +530,38 @@ def load_ssurgo_horizons() -> pd.DataFrame:
 
 
 
-# State geologic map (local file) ─────────────────────────────────────────
+# State geologic map (local file)
 
-def load_state_geology(
-    bbox: tuple | None = None,
-) -> "gpd.GeoDataFrame":
-    """
-    Load South Dakota SGMC2 state geologic map from local shapefile.
-
-    Download SD.zip from https://mrdata.usgs.gov/geology/state/
-    Extract to data/raw/geology/
-
-    Columns of interest in the SGMC2 shapefile:
-        SGMC_LABEL  : standardized unit code — use for mapping
-        GENERALIZE  : generalized rock type / age
-        ORIG_LABEL  : original state map label
-        UNIT_LINK   : joins to CSV attribute tables (unit name, lithology, age)
-
-    Optionally download USGS_SGMC_Tables_CSV.zip and place CSVs in
-    data/raw/geology/ to get full unit names and descriptions.
-    """
-    # Find shapefile — exclude the 3D model folder
-    candidates = list(GEOLOGY_DIR.glob("*.shp"))
-    state_shps = [s for s in candidates if "WSouthDakota" not in s.name]
-
-    if not state_shps:
-        warnings.warn(
-            "No state geology shapefile found in data/raw/geology/. "
-            "Download SD.zip from https://mrdata.usgs.gov/geology/state/ "
-            "and extract to data/raw/geology/.",
-            UserWarning, stacklevel=2,
-        )
+def load_state_geology(bbox=None):
+    shp = GEOLOGY_DIR / "SD_geol_poly.shp"
+    if not shp.exists():
+        warnings.warn("SD_geol_poly.shp not found in data/raw/geology/", UserWarning)
         return gpd.GeoDataFrame()
 
-    shp = state_shps[0]
-    log.info("Loading state geology from: %s", shp.name)
+    gdf = gpd.read_file(str(shp))
+    if gdf.crs is None:
+        gdf = gdf.set_crs("EPSG:4326")
+    else:
+        gdf = gdf.to_crs("EPSG:4326")
 
-    try:
-        gdf = gpd.read_file(str(shp))
-        if gdf.crs is None:
-            gdf = gdf.set_crs(CRS_GEOGRAPHIC)
-        else:
-            gdf = gdf.to_crs(CRS_GEOGRAPHIC)
+    # Join unit descriptions from SD_units.csv
+    units_csv = GEOLOGY_DIR / "SD_units.csv"
+    if units_csv.exists():
+        units = pd.read_csv(units_csv, dtype=str)
+        # Normalize join key to uppercase to match shapefile
+        units = units.rename(columns={"unit_link": "UNIT_LINK"})
+        gdf = gdf.merge(units, on="UNIT_LINK", how="left")
+        log.info("Joined SD_units.csv: added unit_name, unitdesc, rocktype columns")
 
-        if bbox is not None:
-            from shapely.geometry import box
-            gdf = gdf[gdf.geometry.intersects(box(*bbox))].copy()
+    if bbox is not None:
+        from shapely.geometry import box
+        gdf = gdf[gdf.geometry.intersects(box(*bbox))].copy()
 
-        # Optionally join unit descriptions from SGMC CSV tables
-        units_csv = next(GEOLOGY_DIR.glob("*nits*.csv"), None) or \
-                    next(GEOLOGY_DIR.glob("*nit*.csv"), None)
-        if units_csv is not None:
-            unit_desc = pd.read_csv(units_csv, dtype=str)
-            if "UNIT_LINK" in unit_desc.columns and "UNIT_LINK" in gdf.columns:
-                gdf = gdf.merge(unit_desc, on="UNIT_LINK", how="left")
-                log.info("Joined unit descriptions: %d columns",
-                         len(gdf.columns))
-
-        log.info("State geology loaded: %d features", len(gdf))
-        return gdf
-
-    except Exception as e:
-        warnings.warn(f"Could not read state geology shapefile: {e}", UserWarning)
-        return gpd.GeoDataFrame()
+    log.info("State geology loaded: %d features", len(gdf))
+    return gdf
 
 
-# Tribal-collected data (local files) ─────────────────────────────────────
+# Tribal-collected data (local files)
 
 def load_tribal_soil_profiles(
     path=None,
@@ -615,8 +576,8 @@ def load_tribal_soil_profiles(
     from src.constants import SOIL_PROFILE_FIELDS, RAW_DIR
     if path is None:
         candidates = [
-            RAW_DIR / "soil_profiles.csv",
-            RAW_DIR / "soil_profiles.xlsx",
+            RAW_DIR/"soil_profiles.csv",
+            RAW_DIR/"soil_profiles.xlsx",
         ]
         path = next((p for p in candidates if p.exists()), None)
 
@@ -649,8 +610,8 @@ def load_tribal_well_logs(
     from src.constants import WELL_LOG_FIELDS, RAW_DIR
     if path is None:
         candidates = [
-            RAW_DIR / "well_logs.csv",
-            RAW_DIR / "well_logs.xlsx",
+            RAW_DIR/"well_logs.csv",
+            RAW_DIR/"well_logs.xlsx",
         ]
         path = next((p for p in candidates if p.exists()), None)
 
@@ -670,7 +631,7 @@ def load_tribal_well_logs(
     return df.dropna(subset=["well_id", "date"]).reset_index(drop=True)
 
 
-# Internal helpers ────────────────────────────────────────────────────────
+# Internal helpers
 
 def _parse_nwis_site_rdb(text: str) -> "pd.DataFrame":
     """Parse a USGS NWIS site inventory RDB response."""
