@@ -27,7 +27,7 @@ import zipfile
 import tempfile
 from pathlib import Path
 from typing import Optional
-
+from io import BytesIO
 import geopandas as gpd
 import numpy as np
 import pandas as pd
