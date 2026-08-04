@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 loaders.py Public data loaders for tribal_soils_geology.
 
@@ -16,8 +18,6 @@ Data sources:
   USGS 3DEP     : Digital elevation model tiles
   NHD           : Stream network and watershed boundaries
 """
-
-from __future__ import annotations
 
 import io
 import json
@@ -59,11 +59,12 @@ _retry = retry(
 
 
 # Tribal boundaries
-
 def load_tribal_boundaries(
     nation_names: list[str] | None = None,
     force_refresh: bool = False,
 ) -> gpd.GeoDataFrame:
+    if nation_names is None:
+        nation_names = ["Pine Ridge"]
     """
     Load AIANNH Tribal boundaries from Census TIGER.
 
@@ -113,20 +114,12 @@ def load_all_oceti_sakowin(force_refresh: bool = False) -> gpd.GeoDataFrame:
 
 
 # NHD stream network
-
 @_retry
 def load_nhd_flowlines(
     bbox: tuple[float, float, float, float],
     min_stream_order: int = 1,
     force_refresh: bool = False,
 ) -> gpd.GeoDataFrame:
-    """
-    Load NHDPlus HR stream network flowlines within a bounding box.
-
-    Parameters
-    bbox             : (min_lon, min_lat, max_lon, max_lat)
-    min_stream_order : Minimum Strahler stream order (1 = all streams)
-    """
     cache_key  = (f"nhd_{bbox[0]:.2f}_{bbox[1]:.2f}_{bbox[2]:.2f}"
                   f"_{bbox[3]:.2f}_o{min_stream_order}.geojson")
     cache_file = CACHE_DIR / cache_key
@@ -135,28 +128,48 @@ def load_nhd_flowlines(
         return gpd.read_file(cache_file)
 
     where = f"streamorde >= {min_stream_order}" if min_stream_order > 0 else "1=1"
-    r = requests.get(
-        NHD_FLOWLINE_URL,
-        params={
-            "where":          where,
-            "outFields":      "reachcode,gnis_name,streamorde,lengthkm",
-            "f":              "geojson",
-            "returnGeometry": "true",
-            "outSR":          "4326",
-            "geometry":       f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}",
-            "geometryType":   "esriGeometryEnvelope",
-            "spatialRel":     "esriSpatialRelIntersects",
-            "inSR":           "4326",
-        },
-        timeout=120,
-    )
-    if r.status_code == 500:
+
+    all_features = []
+    offset = 0
+    page_size = 2000  # match (or stay under) the service's max
+
+    while True:
+        r = requests.get(
+            NHD_FLOWLINE_URL,
+            params={
+                "where":            where,
+                "outFields":        "reachcode,gnis_name,streamorde,lengthkm",
+                "f":                "geojson",
+                "returnGeometry":   "true",
+                "outSR":            "4326",
+                "geometry":         f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}",
+                "geometryType":     "esriGeometryEnvelope",
+                "spatialRel":       "esriSpatialRelIntersects",
+                "inSR":             "4326",
+                "resultOffset":     offset,
+                "resultRecordCount": page_size,
+            },
+            timeout=120,
+        )
+        if r.status_code == 500:
+            break
+        r.raise_for_status()
+        payload = r.json()
+
+        features = payload.get("features", [])
+        all_features.extend(features)
+
+        if not payload.get("exceededTransferLimit") and len(features) < page_size:
+            break
+        if not features:
+            break
+        offset += page_size
+
+    if not all_features:
         return gpd.GeoDataFrame()
-    r.raise_for_status()
-    gdf = gpd.read_file(io.BytesIO(r.content))
-    if not gdf.empty:
-        gdf = gdf.set_crs(CRS_GEOGRAPHIC, allow_override=True)
-        gdf.to_file(cache_file, driver="GeoJSON")
+
+    gdf = gpd.GeoDataFrame.from_features(all_features, crs=CRS_GEOGRAPHIC)
+    gdf.to_file(cache_file, driver="GeoJSON")
     return gdf
 
 

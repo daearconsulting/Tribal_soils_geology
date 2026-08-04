@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 sovereignty.py Data governance acknowledgment for tribal_soils_geology.
 
@@ -16,8 +18,6 @@ This module ensures every notebook in the series opens with this framing
 and every data export includes provenance sufficient to trace the data back
 to its source and its governance obligations.
 """
-
-from __future__ import annotations
 
 from src.constants import TREATY_PROVENANCE, GOVERNANCE_REFS, WSD_3D_MODEL
 

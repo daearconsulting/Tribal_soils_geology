@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 constants.py Project-wide constants for tribal_soils_geology.
 
@@ -14,7 +16,6 @@ over these lands or their resources to federal agencies or researchers.
 All data use is governed by OCAP®, CARE, FAIR, and IEEE 2890-2025.
 """
 
-from __future__ import annotations
 from pathlib import Path
 
 # Repository root
