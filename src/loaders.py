@@ -131,7 +131,7 @@ def load_nhd_flowlines(
 
     all_features = []
     offset = 0
-    page_size = 2000  # match (or stay under) the service's max
+    page_size = 2000
 
     while True:
         r = requests.get(
