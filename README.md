@@ -1,8 +1,8 @@
 # Tribal Soils and Geology
 
-**Author:** Lilly Jones, PhD, Daear Consulting, LLC/CIRES Earth Lab                          
+**Author:** Lilly Jones, PhD, Daear Consulting                       
 **Primary Focus:** Pine Ridge (Oglala Lakota) and Rosebud (Sicangu Lakota), Oceti Sakowin                    
-**License:** Apache 2.0                        
+**License:** GNU Affero GPL 3.0                      
 
 ## Overview
 
@@ -23,7 +23,7 @@ community members and Tribal decision makers.
 | 02 | Surficial Geology |
 | 03 | Bedrock Geology |
 | 04 | 3D Geologic Model (Spangler 2024) |
-| 05 | Soil Survey — SSURGO |
+| 05 | Soil Survey SSURGO |
 | 06 | Soil Profiles and Horizons |
 | 07 | Geologic Hazards |
 | 08 | Aquifer Geology |
@@ -35,7 +35,7 @@ community members and Tribal decision makers.
 Spangler, L.R., 2024. DOI: [10.5066/P9LK4QHJ](https://doi.org/10.5066/P9LK4QHJ)
 
 A regional-scale volumetric 3D geologic model covering all of western South
-Dakota — including Pine Ridge and Rosebud entirely. Contains 25 subsurface
+Dakota including Pine Ridge and Rosebud entirely. Contains 25 subsurface
 horizon rasters and 35 fault surfaces. Licensed CC0 (public domain).
 The stratigraphic column includes the Ogallala Group (Arikaree aquifer),
 Pierre Shale, Hell Creek Formation, Madison Group, and 20 additional units.
@@ -73,7 +73,7 @@ departments. Lives in `data/raw/` and is never committed to version control.
 
 ### 1. Download required datasets
 
-**3D Geologic Model** (242 MB GDB — required for notebook 04):
+**3D Geologic Model** (242 MB GDB required for notebook 04):
 1. Go to https://doi.org/10.5066/P9LK4QHJ
 2. Download `WSouthDakota3D.gdb.zip` and `WSD_NonspatialTables.zip`
 3. Extract to `data/raw/geology/`
